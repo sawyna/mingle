@@ -7,6 +7,10 @@ socket.on('connect', () => {
     console.log('Yay connected to backend socket');
 });
 
+socket.on('disconnect', (reason) => {
+    console.log(`Disconnected due to ${reason}`);
+});
+
 const send = (message) => {
     if (message.action === 'MINGLE_JOIN') {
         socket.emit('client_join', message);
