@@ -65,6 +65,10 @@ class VideoPlayerProxy {
     addEventListeners(events) {
         events.map(event => {
             this.p.addEventListener(event.type, (e) => {
+                if (this.parity === 1) {
+                    this.parity = 0;
+                    return;
+                }
                 console.log(`forwading event of type ${event.type}`);
                 this.forward(event.createPayload(e, event.type));
             });
