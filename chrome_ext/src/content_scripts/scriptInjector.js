@@ -7,4 +7,6 @@ let inject = () => {
     };
 }
 
-export default inject;
+export default {
+    inject,
+};

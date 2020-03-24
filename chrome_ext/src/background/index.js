@@ -1,26 +1,11 @@
-import mingleClient from './mingleClient';
-import mingleChannel from './mingleChannel';
-
-chrome.runtime.onConnect.addListener((channel) => {
-    if(channel.name === 'mingle-content') {
-        ContentToClient(channel);
-        ClientToContent(channel);
-    }
- });
+import MingleClient from './MingleClient';
+import MingleChannelNode from '../common/MingleChannelNode';
 
 
-// from content channel to client
-const ContentToClient = (channel) => {
-     mingleChannel.listen(channel, (message) => {
-         mingleClient.send(message);
-     });
- }
+const MCSink = new MingleChannelNode('sink', 'mingle-content', (msg) => {
+    MingleClient.send(msg);
+});
 
- // from client to content channel
- const ClientToContent = (channel) => {
-    mingleClient.receive((message) => {
-        console.log('received from server ');
-        console.log(message);
-        mingleChannel.send(channel, message);
-    });
-};
+MingleClient.receive((msg) => {
+    MCSink.send(msg);
+});

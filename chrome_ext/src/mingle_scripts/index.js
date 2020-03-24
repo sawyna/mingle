@@ -1,21 +1,27 @@
 import { v4 as uuidv4 } from 'uuid';
+import lodash from 'lodash-core';
+
+import WindowHelpers from '../common/WindowHelpers';
 
 class VideoPlayerProxy {
     constructor() {
+        // TODO implement a platform based query selector
         this.p = document.querySelectorAll('video')[0];
         console.log('Initialising video player proxy');
         console.log(this.p);
         this.addEventListeners = this.addEventListeners.bind(this);
-        this.forwardEvent = this.forwardEvent.bind(this);
+        this.forward = this.forward.bind(this);
         this._createPlayPayload = this._createPlayPayload.bind(this);
         this.receive = this.receive.bind(this);
         this.handleReceiveEvents = this.handleReceiveEvents.bind(this);
-        this.joinRoom = this.joinRoom.bind(this);
+        this.maybeJoinRoom = this.maybeJoinRoom.bind(this);
         this.userId = uuidv4();
+        this.parity = 0;
         this.init();
     }
 
     init() {
+        this.maybeJoinRoom();
         this.addEventListeners([
             {
                 type: 'play',
@@ -26,17 +32,20 @@ class VideoPlayerProxy {
                 createPayload: this._createPlayPayload,
             }
         ]);
-        this.joinRoom();
-
         this.receive();
     }
 
-    joinRoom() {
-        window.postMessage({
+    maybeJoinRoom() {
+        const currentChannelId = this.getCurrentChannel();
+        if (lodash.isNil(currentChannelId)) {
+            // bail out if there is no session id
+            return;
+        }
+        WindowHelpers.send({
             action: 'MINGLE_JOIN',
             payload: {
                 userId: this.userId,
-                channelId: this.getCurrentChannel(),
+                channelId: currentChannelId,
             }
         });
     }
@@ -45,7 +54,7 @@ class VideoPlayerProxy {
         console.log(e);
         return {
             type: type,
-            'userId': this.userId,
+            userId: this.userId,
             channelId: this.getCurrentChannel(),
             data: {
                 timestamp: e.srcElement.currentTime,
@@ -57,31 +66,27 @@ class VideoPlayerProxy {
         events.map(event => {
             this.p.addEventListener(event.type, (e) => {
                 console.log(`forwading event of type ${event.type}`);
-                this.forwardEvent(event.createPayload(e, event.type));
+                this.forward(event.createPayload(e, event.type));
             });
         });
     }
 
     getCurrentChannel() {
-        return 'yash';
         const url = new URL(document.URL);
         return url.searchParams.get('mingleChannelId');
     }
 
-    forwardEvent(payload) {
-        window.postMessage({
+    forward(payload) {
+        WindowHelpers.send({
             action: 'MINGLE_FORWARD',
             payload: payload,
-        }, '*');
+        });
     }
 
     receive() {
-        window.addEventListener('message', (event) => {
-            const { data } = event;
-            if (data.action === 'MINGLE_RECEIVE') {
-                this.handleReceiveEvents(data.payload);
-            }
-        })
+        WindowHelpers.receive(['MINGLE_RECEIVE'], (msg) => {
+            this.handleReceiveEvents(msg.payload);
+        });
     }
 
     handleReceiveEvents(message) {
@@ -89,6 +94,8 @@ class VideoPlayerProxy {
             console.log('ignoring my triggers');
             return;
         }
+
+        this.parity = 1;
         if (message.type === 'play') {
             this.p.currentTime = message.data.timestamp;
             this.p.play();

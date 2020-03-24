@@ -9,7 +9,7 @@ let handleStartChannel = (e) => {
     let channelId = uuidv4();
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
         let currentURL = new URL(tabs[0].url);
-        currentURL.searchParams.append('mingleChannelId', channelId);
+        currentURL.searchParams.set('mingleChannelId', channelId);
         document.getElementById('channel_id').value = currentURL.toString();
     });
 }

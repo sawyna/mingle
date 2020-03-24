@@ -650,6 +650,18 @@ eval("\n\nvar alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqr
 
 /***/ }),
 
+/***/ "./src/background/MingleClient.js":
+/*!****************************************!*\
+  !*** ./src/background/MingleClient.js ***!
+  \****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! socket.io-client */ \"./node_modules/socket.io-client/lib/index.js\");\n/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(socket_io_client__WEBPACK_IMPORTED_MODULE_0__);\n\nconst socket = socket_io_client__WEBPACK_IMPORTED_MODULE_0___default()('http://localhost:5000');\nsocket.on('connect', () => {\n  console.log('Yay connected to backend socket');\n});\n\nconst send = message => {\n  if (message.action === 'MINGLE_JOIN') {\n    socket.emit('client_join', message);\n  } else if (message.action === 'MINGLE_FORWARD') {\n    socket.emit('client_send', message);\n  }\n};\n\nconst receive = callback => {\n  socket.on('channel_sync', message => {\n    console.log(`Received channel_sync message `);\n    console.log(message);\n    callback(message['payload']);\n  });\n};\n\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n  send,\n  receive\n});\n\n//# sourceURL=webpack:///./src/background/MingleClient.js?");
+
+/***/ }),
+
 /***/ "./src/background/index.js":
 /*!*********************************!*\
   !*** ./src/background/index.js ***!
@@ -658,31 +670,19 @@ eval("\n\nvar alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqr
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _mingleClient__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./mingleClient */ \"./src/background/mingleClient.js\");\n/* harmony import */ var _mingleChannel__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./mingleChannel */ \"./src/background/mingleChannel.js\");\n\n\nchrome.runtime.onConnect.addListener(channel => {\n  if (channel.name === 'mingle-content') {\n    ContentToClient(channel);\n    ClientToContent(channel);\n  }\n}); // from content channel to client\n\nconst ContentToClient = channel => {\n  _mingleChannel__WEBPACK_IMPORTED_MODULE_1__[\"default\"].listen(channel, message => {\n    _mingleClient__WEBPACK_IMPORTED_MODULE_0__[\"default\"].send(message);\n  });\n}; // from client to content channel\n\n\nconst ClientToContent = channel => {\n  _mingleClient__WEBPACK_IMPORTED_MODULE_0__[\"default\"].receive(message => {\n    console.log('received from server ');\n    console.log(message);\n    _mingleChannel__WEBPACK_IMPORTED_MODULE_1__[\"default\"].send(channel, message);\n  });\n};\n\n//# sourceURL=webpack:///./src/background/index.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _MingleClient__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./MingleClient */ \"./src/background/MingleClient.js\");\n/* harmony import */ var _common_MingleChannelNode__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../common/MingleChannelNode */ \"./src/common/MingleChannelNode.js\");\n\n\nconst MCSink = new _common_MingleChannelNode__WEBPACK_IMPORTED_MODULE_1__[\"default\"]('sink', 'mingle-content', msg => {\n  _MingleClient__WEBPACK_IMPORTED_MODULE_0__[\"default\"].send(msg);\n});\n_MingleClient__WEBPACK_IMPORTED_MODULE_0__[\"default\"].receive(msg => {\n  MCSink.send(msg);\n});\n\n//# sourceURL=webpack:///./src/background/index.js?");
 
 /***/ }),
 
-/***/ "./src/background/mingleChannel.js":
+/***/ "./src/common/MingleChannelNode.js":
 /*!*****************************************!*\
-  !*** ./src/background/mingleChannel.js ***!
+  !*** ./src/common/MingleChannelNode.js ***!
   \*****************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\nconst listen = (channel, callback) => {\n  channel.onMessage.addListener(message => {\n    console.log(`received message`);\n    console.log(message);\n    callback(message);\n  });\n};\n\nconst send = (channel, message) => {\n  channel.postMessage(message);\n};\n\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n  send,\n  listen\n});\n\n//# sourceURL=webpack:///./src/background/mingleChannel.js?");
-
-/***/ }),
-
-/***/ "./src/background/mingleClient.js":
-/*!****************************************!*\
-  !*** ./src/background/mingleClient.js ***!
-  \****************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! socket.io-client */ \"./node_modules/socket.io-client/lib/index.js\");\n/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(socket_io_client__WEBPACK_IMPORTED_MODULE_0__);\n\nconst socket = socket_io_client__WEBPACK_IMPORTED_MODULE_0___default()('http://localhost:5000');\nsocket.on('connect', () => {\n  console.log('Yay connected to backend socket');\n});\n\nconst send = message => {\n  if (message.action === 'MINGLE_JOIN') {\n    socket.emit('client_join', message);\n  } else if (message.action === 'MINGLE_FORWARD') {\n    socket.emit('client_send', message);\n  }\n};\n\nconst receive = callback => {\n  socket.on('channel_sync', message => {\n    console.log(`Received channel_sync message ${message}`);\n    callback(message['payload']);\n  });\n  socket.on('test_ack', message => {\n    console.log('Received test_ack');\n    console.log(message);\n  });\n};\n\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n  send,\n  receive\n});\n\n//# sourceURL=webpack:///./src/background/mingleClient.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return MingleChannelNode; });\nclass MingleChannelNode {\n  constructor(type, channel_name, handleReceive) {\n    this.type = type;\n    this.channel_name = channel_name;\n    this.handleReceive = handleReceive;\n    this.channel = null;\n    this.setup = this.setup.bind(this);\n    this._setup = this._setup.bind(this);\n    this.setup();\n  }\n\n  setup() {\n    if (this.type === 'source') {\n      this.channel = chrome.runtime.connect({\n        name: this.channel_name\n      });\n\n      this._setup();\n    } else if (this.type == 'sink') {\n      chrome.runtime.onConnect.addListener(_channel => {\n        if (_channel.name === this.channel_name) {\n          this.channel = _channel;\n\n          this._setup();\n        }\n      });\n    }\n  }\n\n  _setup() {\n    this.channel.onDisconnect.addListener(() => {\n      // try to reconnect if the connection is gone\n      this.setup();\n    });\n    this.channel.onMessage.addListener(this.handleReceive);\n  }\n\n  send(msg) {\n    console.log(`posting message from ${this.type}`);\n    console.log(msg);\n    this.channel.postMessage(msg);\n  }\n\n}\n\n//# sourceURL=webpack:///./src/common/MingleChannelNode.js?");
 
 /***/ }),
 

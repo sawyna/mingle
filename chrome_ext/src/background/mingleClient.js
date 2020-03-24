@@ -18,14 +18,10 @@ const send = (message) => {
 
 const receive = (callback) => {
     socket.on('channel_sync', (message) => {
-        console.log(`Received channel_sync message ${message}`);
+        console.log(`Received channel_sync message `);
+        console.log(message);
         callback(message['payload']);
     });
-
-    socket.on('test_ack', (message) => {
-        console.log('Received test_ack');
-        console.log(message);
-    })
 }
 
 export default {

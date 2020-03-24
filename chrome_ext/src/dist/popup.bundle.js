@@ -214,7 +214,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _v35
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! uuid */ \"./node_modules/uuid/dist/esm-browser/index.js\");\n\n\nlet createChannel = () => {\n  let button = document.getElementById('start_channel');\n  button.onclick = handleStartChannel;\n};\n\nlet handleStartChannel = e => {\n  let channelId = Object(uuid__WEBPACK_IMPORTED_MODULE_0__[\"v4\"])();\n  chrome.tabs.query({\n    active: true,\n    currentWindow: true\n  }, tabs => {\n    let currentURL = new URL(tabs[0].url);\n    currentURL.searchParams.append('mingleChannelId', channelId);\n    document.getElementById('channel_id').value = currentURL.toString();\n  });\n};\n\ncreateChannel();\n\n//# sourceURL=webpack:///./src/popup/index.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! uuid */ \"./node_modules/uuid/dist/esm-browser/index.js\");\n\n\nlet createChannel = () => {\n  let button = document.getElementById('start_channel');\n  button.onclick = handleStartChannel;\n};\n\nlet handleStartChannel = e => {\n  let channelId = Object(uuid__WEBPACK_IMPORTED_MODULE_0__[\"v4\"])();\n  chrome.tabs.query({\n    active: true,\n    currentWindow: true\n  }, tabs => {\n    let currentURL = new URL(tabs[0].url);\n    currentURL.searchParams.set('mingleChannelId', channelId);\n    document.getElementById('channel_id').value = currentURL.toString();\n  });\n};\n\ncreateChannel();\n\n//# sourceURL=webpack:///./src/popup/index.js?");
 
 /***/ })
 
