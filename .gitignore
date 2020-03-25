@@ -3,3 +3,5 @@ node_modules
 mingle_venv
 __pycache__/
 dist
+.DS_Store
+mingle.zip

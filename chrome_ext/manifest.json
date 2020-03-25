@@ -18,7 +18,7 @@
     ],
     "content_scripts": [
         {
-            "matches": ["https://*.youtube.com/*", "https://*.netflix.com/*"],
+            "matches": ["https://*.youtube.com/*", "https://*.netflix.com/*", "https://*.primevideo.com/*", "https://*.amazon.com/*"],
             "all_frames": true,
             "js": ["content_scripts.bundle.js"]
         }

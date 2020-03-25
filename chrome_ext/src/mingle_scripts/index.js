@@ -109,4 +109,9 @@ class VideoPlayerProxy {
     }
 }
 
-new VideoPlayerProxy();
+let init = setInterval(() => {
+    if (document.querySelectorAll('video')[0] !== undefined) {
+        new VideoPlayerProxy();
+        clearInterval(init);
+    }
+}, 2000);
