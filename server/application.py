@@ -18,15 +18,18 @@ def handle_client_send(message):
 @socketio.on('client_join')
 def handle_client_join(message):
     print('Client join: ', flask.request.sid)
-    payload = message['payload']
-    user_id = payload['userId']
-    channel_id = payload['channelId']
+    user_id = message['userId']
+    channel_id = message['channelId']
     join_room(channel_id)
     print('User joined room', user_id, channel_id)
+
+@app.route('/test')
+def test():
+    return 'yash'
 
 # run the app.
 if __name__ == "__main__":
     # Setting debug to True enables debug output. This line should be
     # removed before deploying a production app.
     app.debug = True
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0')

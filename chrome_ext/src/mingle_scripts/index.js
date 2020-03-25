@@ -43,10 +43,8 @@ class VideoPlayerProxy {
         }
         WindowHelpers.send({
             action: 'MINGLE_JOIN',
-            payload: {
-                userId: this.userId,
-                channelId: currentChannelId,
-            }
+            userId: this.userId,
+            channelId: currentChannelId,
         });
     }
 

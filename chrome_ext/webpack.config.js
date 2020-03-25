@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     mode: 'development',
@@ -16,7 +17,7 @@ module.exports = {
     },
     module: {
         rules: [
-            { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' }
+            { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' },
         ]
     },
     plugins: [
@@ -24,6 +25,12 @@ module.exports = {
             title: 'Popup',
             filename: 'popup.html',
             template: path.join(__dirname, 'src', 'popup', 'index.html')
-        })
+        }),
+        new CopyWebpackPlugin([
+            {
+                from: path.join(__dirname, 'manifest.json'),
+                to: path.join(__dirname, 'src', 'dist'),
+            }
+        ]),
     ],
 };

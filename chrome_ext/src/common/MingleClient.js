@@ -1,34 +1,36 @@
 import io from 'socket.io-client';
 
 
-const socket = io('http://localhost:5000');
-
-socket.on('connect', () => {
-    console.log('Yay connected to backend socket');
-});
-
-socket.on('disconnect', (reason) => {
-    console.log(`Disconnected due to ${reason}`);
-});
-
-const send = (message) => {
-    if (message.action === 'MINGLE_JOIN') {
-        socket.emit('client_join', message);
+export default class MingleClient {
+    constructor() {
+        this.socket = io('http://34.210.140.190:5000');
+        this.setup();
     }
-    else if (message.action === 'MINGLE_FORWARD') {
-        socket.emit('client_send', message);
+
+    setup() {
+        this.socket.on('connect', () => {
+            console.log('Yay connected to backend socket');
+        });
+        
+        this.socket.on('disconnect', (reason) => {
+            console.log(`Disconnected due to ${reason}`);
+        });        
+    }
+
+    send(message) {
+        if (message.action === 'MINGLE_JOIN') {
+            this.socket.emit('client_join', message);
+        }
+        else if (message.action === 'MINGLE_FORWARD') {
+            this.socket.emit('client_send', message);
+        }
+    }
+
+    receive(callback) {
+        this.socket.on('channel_sync', (message) => {
+            console.log(`Received channel_sync message `);
+            console.log(message);
+            callback(message['payload']);
+        });
     }
 }
-
-const receive = (callback) => {
-    socket.on('channel_sync', (message) => {
-        console.log(`Received channel_sync message `);
-        console.log(message);
-        callback(message['payload']);
-    });
-}
-
-export default {
-    send,
-    receive,
-};
