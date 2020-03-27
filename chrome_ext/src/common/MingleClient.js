@@ -7,6 +7,11 @@ export default class MingleClient {
         this.setup();
     }
 
+    disconnect() {
+        console.log('Disconnecting socket');
+        this.socket.disconnect();
+    }
+
     setup() {
         this.socket.on('connect', () => {
             console.log('Yay connected to backend socket');
@@ -23,6 +28,9 @@ export default class MingleClient {
         }
         else if (message.action === 'MINGLE_FORWARD') {
             this.socket.emit('client_send', message);
+        }
+        else if (message.action === 'MINGLE_DISCONNECT') {
+            this.disconnect();
         }
     }
 
