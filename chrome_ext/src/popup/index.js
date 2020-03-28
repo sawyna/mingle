@@ -10,8 +10,19 @@ let handleStartChannel = (e) => {
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
         let currentURL = new URL(tabs[0].url);
         currentURL.searchParams.set('mingleChannelId', channelId);
-        document.getElementById('channel_id').value = currentURL.toString();
+        let mingleUrl = currentURL.toString();
+        copyToClipboard(mingleUrl);
+        alert("URL copied to clipboard :)");
     });
+}
+
+function copyToClipboard(text) {
+    var dummy = document.createElement("textarea");
+    document.body.appendChild(dummy);
+    dummy.value = text;
+    dummy.select();
+    document.execCommand("copy");
+    document.body.removeChild(dummy);
 }
 
 createChannel();
