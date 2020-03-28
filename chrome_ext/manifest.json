@@ -1,6 +1,6 @@
 {
     "name": "Mingle",
-    "version": "1.2",
+    "version": "1.3",
     "description": "Mingle with your friends!",
     "manifest_version": 2,
     "background": {
