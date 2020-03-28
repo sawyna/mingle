@@ -14,6 +14,17 @@ chrome.runtime.onMessage.addListener(({ action, channelName }) => {
 const initMCSink = function (channelName) {
     if (lodash.has(_CACHE, channelName)) {
         console.log('Page reloaded and client wants to connect agagin');
+        const oldStuff = _CACHE[channelName];
+        try {
+            oldStuff.mingleClient.disconnect();
+            oldStuff.mcSink.teardown();
+        }
+        catch (err) {
+            console.log(err);
+            console.log('Failed to teardown');
+        }
+
+        delete _CACHE[channelName];
     }
 
     const mingleClient = new MingleClient();

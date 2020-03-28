@@ -28,9 +28,11 @@ let getOrCreateSource = (userId) => {
 }
 
 let scriptEvents = () => {
-    WindowHelpers.receive(['MINGLE_FORWARD', 'MINGLE_JOIN'], (msg) => {
+    WindowHelpers.receive(['MINGLE_FORWARD', 'MINGLE_JOIN', 'MINGLE_DISCONNECT'], (msg) => {
         const mcSource = getOrCreateSource(msg['userId']);
-        mcSource.send(msg);
+        if (mcSource) {
+            mcSource.send(msg);
+        }
     });
 }
 

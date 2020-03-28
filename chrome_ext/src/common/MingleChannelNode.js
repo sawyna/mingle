@@ -10,6 +10,10 @@ export default class MingleChannelNode {
         this.setup();
     }
 
+    teardown() {
+        this.channel.disconnect();
+    }
+
     setup() {
         if (this.type === 'source') {
             this.channel = chrome.runtime.connect({ name: this.channel_name });

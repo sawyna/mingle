@@ -21,7 +21,10 @@ class VideoPlayerProxy {
     }
 
     init() {
-        this.maybeJoinRoom();
+        const joinedRoom = this.maybeJoinRoom();
+        if (!joinedRoom) {
+            return;
+        }
         this.addEventListeners([
             {
                 type: 'play',
@@ -33,19 +36,29 @@ class VideoPlayerProxy {
             }
         ]);
         this.receive();
+
+        window.addEventListener('beforeunload', (e) => {
+            WindowHelpers.send({
+                action: 'MINGLE_DISCONNECT',
+                userId: this.userId,
+                channelId: this.getCurrentChannel(),     
+            })
+        });
     }
 
     maybeJoinRoom() {
         const currentChannelId = this.getCurrentChannel();
+        console.log(`Getting a new current channel ${currentChannelId}`);
         if (lodash.isNil(currentChannelId)) {
             // bail out if there is no session id
-            return;
+            return false;
         }
         WindowHelpers.send({
             action: 'MINGLE_JOIN',
             userId: this.userId,
             channelId: currentChannelId,
         });
+        return true;
     }
 
     _createPlayPayload(e, type) {
@@ -79,6 +92,10 @@ class VideoPlayerProxy {
     }
 
     forward(payload) {
+        if (lodash.isNil(payload['channelId'])) {
+            console.log('ignoring non existentn channelId');
+            return;
+        }
         WindowHelpers.send({
             action: 'MINGLE_FORWARD',
             payload: payload,
@@ -94,6 +111,11 @@ class VideoPlayerProxy {
     handleReceiveEvents(message) {
         if (message.userId === this.userId) {
             console.log('ignoring my triggers');
+            return;
+        }
+
+        if (message.channelId !== this.getCurrentChannel()) {
+            console.log('Ignoring events from other channels');
             return;
         }
 
