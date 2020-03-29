@@ -5,19 +5,49 @@ import WindowHelpers from '../common/WindowHelpers';
 
 class VideoPlayerProxy {
     constructor() {
-        // TODO implement a platform based query selector
-        this.p = document.querySelectorAll('video')[0];
-        console.log('Initialising video player proxy');
-        console.log(this.p);
+        
         this.addEventListeners = this.addEventListeners.bind(this);
         this.forward = this.forward.bind(this);
         this._createPlayPayload = this._createPlayPayload.bind(this);
         this.receive = this.receive.bind(this);
         this.handleReceiveEvents = this.handleReceiveEvents.bind(this);
         this.maybeJoinRoom = this.maybeJoinRoom.bind(this);
+        this.getCurrentPlatform = this.getCurrentPlatform.bind(this);
+        this.initPlayers = this.initPlayers.bind(this);
+
+        this.currentPlatform = this.getCurrentPlatform();
+        this.initPlayers();
+        console.log('Initialising video player proxy');
+        console.log(this.p);
+
+        if (this.p === null) {
+            return;
+        }
+
         this.userId = uuidv4();
         this.parity = 0;
         this.init();
+    }
+
+    initPlayers() {
+        let player = null;
+
+        try {
+            if (this.currentPlatform === 'netflix') {
+                const videoPlayer = netflix.appContext.state.playerApp.getAPI().videoPlayer;
+                const playerSessionId = videoPlayer.getAllPlayerSessionIds()[0];
+                player = videoPlayer.getVideoPlayerBySessionId(playerSessionId);
+            }
+            else {
+                player = document.querySelectorAll('video')[0];
+            }
+
+            this.p = player;
+            this.originalp = document.querySelectorAll('video')[0];
+        }
+        catch (err) {
+            console.log(`Failed to init player: ${err}`);
+        }
     }
 
     init() {
@@ -25,6 +55,7 @@ class VideoPlayerProxy {
         if (!joinedRoom) {
             return;
         }
+
         this.addEventListeners([
             {
                 type: 'play',
@@ -61,6 +92,15 @@ class VideoPlayerProxy {
         return true;
     }
 
+    getCurrentPlatform() {
+        const url = new URL(document.URL);
+        if (url.host.includes('netflix')) {
+            return 'netflix';
+        }
+
+        return 'other';
+    }
+
     _createPlayPayload(e, type) {
         console.log(e);
         return {
@@ -74,12 +114,15 @@ class VideoPlayerProxy {
     }
 
     addEventListeners(events) {
+        // add events to the actual html5 player
         events.map(event => {
-            this.p.addEventListener(event.type, (e) => {
+            this.originalp.addEventListener(event.type, (e) => {
+                console.log(`event listener: ${event.type}, parity: ${this.parity}`);
                 if (this.parity === 1) {
                     this.parity = 0;
                     return;
                 }
+                
                 console.log(`forwading event of type ${event.type}`);
                 this.forward(event.createPayload(e, event.type));
             });
@@ -108,6 +151,30 @@ class VideoPlayerProxy {
         });
     }
 
+    play(timeSec) {
+        if (this.currentPlatform === 'netflix') {
+            this.p.seek(timeSec * 1000);
+            this.p.play();
+        }
+        else {
+            this.p.currentTime = timeSec;
+            this.p.play();
+        }
+    }
+
+    pause() {
+        this.p.pause();
+    }
+
+    getCurrenTimeInSec() {
+        if (this.currentPlatform === 'netflix') {
+            return this.p.getCurrentTime() / 1000;
+        }
+        else {
+            this.p.currentTime;
+        }
+    }
+
     handleReceiveEvents(message) {
         if (message.userId === this.userId) {
             console.log('ignoring my triggers');
@@ -119,14 +186,15 @@ class VideoPlayerProxy {
             return;
         }
 
-        this.parity = 1;
+        console.log(`trying to ${message.type}`);
         if (message.type === 'play') {
-            this.p.currentTime = message.data.timestamp;
-            this.p.play();
+            this.parity = 1;
+            this.play(message.data.timestamp);
         }
 
         if (message.type === 'pause') {
-            this.p.pause();
+            this.parity = 1;
+            this.pause();
         }
     }
 }
@@ -136,4 +204,4 @@ let init = setInterval(() => {
         new VideoPlayerProxy();
         clearInterval(init);
     }
-}, 2000);
+}, 1000);
