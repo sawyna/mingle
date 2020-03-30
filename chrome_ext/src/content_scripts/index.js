@@ -18,10 +18,8 @@ let getOrCreateSource = (userId) => {
     });
 
     const mcSource = new MingleChannelNode('source', `mingle-content-${userId}`, (msg) => {
-        WindowHelpers.send({
-            action: 'MINGLE_RECEIVE',
-            payload: msg,
-        });    
+        msg.action = 'MINGLE_RECEIVE';
+        WindowHelpers.send(msg);    
     });
     _MC_SOURCES[userId] = mcSource;
     return mcSource;

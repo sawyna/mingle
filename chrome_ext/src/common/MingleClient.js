@@ -38,7 +38,7 @@ export default class MingleClient {
         this.socket.on('channel_sync', (message) => {
             console.log(`Received channel_sync message `);
             console.log(message);
-            callback(message['payload']);
+            callback(message);
         });
     }
 }

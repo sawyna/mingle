@@ -8,29 +8,24 @@ class VideoPlayerProxy {
         
         this.addEventListeners = this.addEventListeners.bind(this);
         this.forward = this.forward.bind(this);
-        this._createPlayPayload = this._createPlayPayload.bind(this);
         this.receive = this.receive.bind(this);
         this.handleReceiveEvents = this.handleReceiveEvents.bind(this);
         this.maybeJoinRoom = this.maybeJoinRoom.bind(this);
         this.getCurrentPlatform = this.getCurrentPlatform.bind(this);
-        this.initPlayers = this.initPlayers.bind(this);
+        this.createMinglePayload = this.createMinglePayload.bind(this);
+
+        this._initPlayers = this._initPlayers.bind(this);
 
         this.currentPlatform = this.getCurrentPlatform();
-        this.initPlayers();
-        console.log('Initialising video player proxy');
-        console.log(this.p);
-
-        if (this.p === null) {
-            return;
-        }
 
         this.userId = uuidv4();
         this.parity = 0;
         this.init();
     }
 
-    initPlayers() {
+    _initPlayers() {
         let player = null;
+        this.p = null;
 
         try {
             if (this.currentPlatform === 'netflix') {
@@ -51,6 +46,14 @@ class VideoPlayerProxy {
     }
 
     init() {
+        this._initPlayers();
+        console.log('Initialising video player proxy');
+        console.log(this.p);
+
+        if (this.p === null) {
+            return;
+        }
+
         const joinedRoom = this.maybeJoinRoom();
         if (!joinedRoom) {
             return;
@@ -59,22 +62,27 @@ class VideoPlayerProxy {
         this.addEventListeners([
             {
                 type: 'play',
-                createPayload: this._createPlayPayload,
             },
             {
                 type: 'pause',
-                createPayload: this._createPlayPayload,
             }
         ]);
+        this.addKeyboardEventListeners();
+
         this.receive();
 
         window.addEventListener('beforeunload', (e) => {
-            WindowHelpers.send({
-                action: 'MINGLE_DISCONNECT',
-                userId: this.userId,
-                channelId: this.getCurrentChannel(),     
-            })
+            this.forward(this.createMinglePayload('MINGLE_DISCONNECT'));
         });
+    }
+
+    createMinglePayload(action, payload) {
+        return {
+            action: action,
+            userId: this.userId,
+            channelId: this.getCurrentChannel(),
+            payload: payload,
+        };
     }
 
     maybeJoinRoom() {
@@ -84,11 +92,7 @@ class VideoPlayerProxy {
             // bail out if there is no session id
             return false;
         }
-        WindowHelpers.send({
-            action: 'MINGLE_JOIN',
-            userId: this.userId,
-            channelId: currentChannelId,
-        });
+        this.forward(this.createMinglePayload('MINGLE_JOIN'));
         return true;
     }
 
@@ -99,18 +103,6 @@ class VideoPlayerProxy {
         }
 
         return 'other';
-    }
-
-    _createPlayPayload(e, type) {
-        console.log(e);
-        return {
-            type: type,
-            userId: this.userId,
-            channelId: this.getCurrentChannel(),
-            data: {
-                timestamp: e.srcElement.currentTime,
-            }
-        }
     }
 
     addEventListeners(events) {
@@ -124,9 +116,36 @@ class VideoPlayerProxy {
                 }
                 
                 console.log(`forwading event of type ${event.type}`);
-                this.forward(event.createPayload(e, event.type));
+                this.forward(this.createMinglePayload('MINGLE_FORWARD', {
+                    type: event.type,
+                    timestamp: e.srcElement.currentTime,
+                }));
             });
         });
+    }
+
+    addKeyboardEventListeners() {
+        if (this.currentPlatform === 'netflix') {
+            return;
+        }
+        document.addEventListener('keyup', (e) => {
+            if (e.code === 'ArrowRight' || e.code === 'ArrowLeft') {
+                if (this.originalp.paused) {
+                    console.log('ignore arrow press when video is paused. play event is triggered anyway');
+                    return;
+                }
+
+                if (this.parity === 1) {
+                    console.log('calm down when you receive events from others');
+                    return;
+                }
+
+                this.forward(this.createMinglePayload('MINGLE_FORWARD', {
+                    type: 'play',
+                    timestamp: this.getCurrenTimeInSec(),
+                }))
+            }
+        })
     }
 
     getCurrentChannel() {
@@ -134,21 +153,56 @@ class VideoPlayerProxy {
         return url.searchParams.get('mingleChannelId');
     }
 
-    forward(payload) {
-        if (lodash.isNil(payload['channelId'])) {
+    forward(message) {
+        console.log('in forward');
+        console.log(message);
+        if (lodash.isNil(message.channelId)) {
             console.log('ignoring non existentn channelId');
             return;
         }
-        WindowHelpers.send({
-            action: 'MINGLE_FORWARD',
-            payload: payload,
+        WindowHelpers.send(message);
+    }
+    
+    receive() {
+        WindowHelpers.receive(['MINGLE_RECEIVE'], (msg) => {
+            this.handleReceiveEvents(msg);
         });
     }
 
-    receive() {
-        WindowHelpers.receive(['MINGLE_RECEIVE'], (msg) => {
-            this.handleReceiveEvents(msg.payload);
-        });
+    handleReceiveEvents(message) {
+        console.log('received message');
+        console.log(message);
+        if (message.userId === this.userId) {
+            console.log('ignoring my triggers');
+            return;
+        }
+
+        if (message.channelId !== this.getCurrentChannel()) {
+            console.log('Ignoring events from other channels');
+            return;
+        }
+
+        const payload = message.payload;
+        console.log(`trying to ${payload.type}`);
+        if (payload.type === 'play') {
+            this.parity = 1;
+            this.play(payload.timestamp);
+        }
+
+        if (payload.type === 'pause') {
+            this.parity = 1;
+            this.pause();
+        }
+    }
+
+    // video wrappers
+    getCurrenTimeInSec() {
+        if (this.currentPlatform === 'netflix') {
+            return this.p.getCurrentTime() / 1000;
+        }
+        else {
+            return this.p.currentTime;
+        }
     }
 
     play(timeSec) {
@@ -164,38 +218,6 @@ class VideoPlayerProxy {
 
     pause() {
         this.p.pause();
-    }
-
-    getCurrenTimeInSec() {
-        if (this.currentPlatform === 'netflix') {
-            return this.p.getCurrentTime() / 1000;
-        }
-        else {
-            this.p.currentTime;
-        }
-    }
-
-    handleReceiveEvents(message) {
-        if (message.userId === this.userId) {
-            console.log('ignoring my triggers');
-            return;
-        }
-
-        if (message.channelId !== this.getCurrentChannel()) {
-            console.log('Ignoring events from other channels');
-            return;
-        }
-
-        console.log(`trying to ${message.type}`);
-        if (message.type === 'play') {
-            this.parity = 1;
-            this.play(message.data.timestamp);
-        }
-
-        if (message.type === 'pause') {
-            this.parity = 1;
-            this.pause();
-        }
     }
 }
 

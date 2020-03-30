@@ -30,6 +30,7 @@ const initMCSink = function (channelName) {
     const mingleClient = new MingleClient();
     const mcSink = new MingleChannelNode('sink', channelName, (msg) => {
         console.log(`received for sink ${mcSink.channel_name}`);
+        console.log(msg);
         mingleClient.send(msg);
     });
 
