@@ -11,7 +11,7 @@ socketio = SocketIO(app, cors_allowed_origins='*')
 def handle_client_send(message):
     print 'Received request from %s' % flask.request.sid
     print 'Received message %s' % message
-    channel_id = message['channelId']
+    channel_id = message.get('channelId') or message.get('payload', {}).get('channelId')
     emit('channel_sync', message, room=channel_id)
 
 @socketio.on('client_join')
