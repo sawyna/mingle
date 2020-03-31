@@ -146,7 +146,7 @@ class VideoPlayerProxy {
 
                 this.forward(this.createMinglePayload('MINGLE_FORWARD', {
                     type: 'play',
-                    timestamp: this.getCurrenTimeInSec(),
+                    timestamp: this.getCurrentTimeInSec(),
                 }))
             }
         })
@@ -200,7 +200,7 @@ class VideoPlayerProxy {
     }
 
     // video wrappers
-    getCurrenTimeInSec() {
+    getCurrentTimeInSec() {
         if (this.currentPlatform === 'netflix') {
             return this.p.getCurrentTime() / 1000;
         }
