@@ -31,6 +31,10 @@ module.exports = {
             {
                 from: path.join(__dirname, 'manifest.json'),
                 to: path.join(__dirname, 'src', 'dist'),
+            },
+            {
+                from: path.join(__dirname, 'images'),
+                to: path.join(__dirname, 'src', 'dist', 'images'),
             }
         ]),
     ],

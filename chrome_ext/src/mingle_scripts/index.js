@@ -102,6 +102,10 @@ class VideoPlayerProxy {
             return 'netflix';
         }
 
+        if (url.host.includes('primevideo') || url.host.includes('amazon')) {
+            return 'primevideo';
+        }
+
         return 'other';
     }
 
@@ -125,7 +129,7 @@ class VideoPlayerProxy {
     }
 
     addKeyboardEventListeners() {
-        if (this.currentPlatform === 'netflix') {
+        if (this.currentPlatform === 'netflix' || this.currentPlatform === 'primevideo') {
             return;
         }
         document.addEventListener('keyup', (e) => {
