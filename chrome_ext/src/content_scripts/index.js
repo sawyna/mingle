@@ -34,5 +34,13 @@ let scriptEvents = () => {
     });
 }
 
+chrome.runtime.onMessage.addListener((msg) => {
+    console.log(`received in content script MINGLE_RELOAD ${msg}`);
+    if (msg.action === 'MINGLE_RELOAD') {
+        const url = msg.payload.url;
+        window.location.href = url;
+    }
+});
+
 ScriptInjector.inject();
 scriptEvents();

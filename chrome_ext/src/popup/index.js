@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import WindowHelpers from '../common/WindowHelpers';
 
 let createChannel = () => {
     let button = document.getElementById('start_channel');
@@ -8,13 +9,17 @@ let createChannel = () => {
 let handleStartChannel = (e) => {
     let channelId = uuidv4();
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+        console.log(tabs[0]);
         let currentURL = new URL(tabs[0].url);
         currentURL.searchParams.set('mingleChannelId', channelId);
         let mingleUrl = currentURL.toString();
         copyToClipboard(mingleUrl);
         alert("URL copied to clipboard :). Share this with your loved ones and enjoy!");
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            chrome.tabs.update(tabs[0].id, {url: mingleUrl});
+        chrome.tabs.sendMessage(tabs[0].id, {
+            action: 'MINGLE_RELOAD',
+            payload: {
+                url: mingleUrl,
+            },
         });
     });
 }
