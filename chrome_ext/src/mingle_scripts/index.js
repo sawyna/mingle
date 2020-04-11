@@ -26,6 +26,7 @@ class VideoPlayerProxy {
     _initPlayers() {
         let player = null;
         this.p = null;
+        this.originalp = null;
 
         try {
             if (this.currentPlatform === 'netflix') {
@@ -60,8 +61,9 @@ class VideoPlayerProxy {
         this._initPlayers();
         console.log('Initialising video player proxy');
         console.log(this.p);
+        console.log(this.originalp);
 
-        if (this.p === null) {
+        if (lodash.isNil(this.p) || lodash.isNil(this.originalp)) {
             return;
         }
 
@@ -238,7 +240,7 @@ class VideoPlayerProxy {
 
 let init = setInterval(() => {
     let vpp = new VideoPlayerProxy();
-    if (vpp.p !== null) {
+    if (!lodash.isNil(vpp.originalp)) {
         clearInterval(init);
     }
 }, 1000);
