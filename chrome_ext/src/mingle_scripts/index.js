@@ -31,14 +31,25 @@ class VideoPlayerProxy {
             if (this.currentPlatform === 'netflix') {
                 const videoPlayer = netflix.appContext.state.playerApp.getAPI().videoPlayer;
                 const playerSessionId = videoPlayer.getAllPlayerSessionIds()[0];
-                player = videoPlayer.getVideoPlayerBySessionId(playerSessionId);
+                this.p = videoPlayer.getVideoPlayerBySessionId(playerSessionId);
+                this.originalp = document.querySelectorAll('video')[0];
+            }
+            else if (this.currentPlatform === 'primevideo') {
+                let videoPlayers = document.querySelectorAll('video');
+                let videoPlayer = null;
+                for (let i = 0; i < videoPlayers.length; i++) {
+                    videoPlayer = videoPlayers[i];
+                    if (videoPlayer.src !== undefined && (videoPlayer.src.includes('primevideo') || videoPlayer.src.includes('amazon'))) {
+                        this.p = videoPlayer;
+                        this.originalp = videoPlayer;
+                        break;
+                    }
+                }
             }
             else {
-                player = document.querySelectorAll('video')[0];
+                this.p = document.querySelectorAll('video')[0];
+                this.originalp = this.p;
             }
-
-            this.p = player;
-            this.originalp = document.querySelectorAll('video')[0];
         }
         catch (err) {
             console.log(`Failed to init player: ${err}`);
@@ -226,8 +237,8 @@ class VideoPlayerProxy {
 }
 
 let init = setInterval(() => {
-    if (document.querySelectorAll('video')[0] !== undefined) {
-        new VideoPlayerProxy();
+    let vpp = new VideoPlayerProxy();
+    if (vpp.p !== null) {
         clearInterval(init);
     }
 }, 1000);
