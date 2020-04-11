@@ -14,7 +14,6 @@ let handleStartChannel = (e) => {
         currentURL.searchParams.set('mingleChannelId', channelId);
         let mingleUrl = currentURL.toString();
         copyToClipboard(mingleUrl);
-        alert("URL copied to clipboard :). Share this with your loved ones and enjoy!");
         chrome.tabs.sendMessage(tabs[0].id, {
             action: 'MINGLE_RELOAD',
             payload: {

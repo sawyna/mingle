@@ -38,6 +38,7 @@ chrome.runtime.onMessage.addListener((msg) => {
     console.log(`received in content script MINGLE_RELOAD ${msg}`);
     if (msg.action === 'MINGLE_RELOAD') {
         const url = msg.payload.url;
+        alert("URL copied to clipboard :). Share this with your loved ones and enjoy!");
         window.location.href = url;
     }
 });
