@@ -55,6 +55,9 @@ const initMCSink = function (channelName) {
     })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
     
 ga('create', 'UA-163387829-1', 'auto');
+// Modifications: 
+ga('set', 'checkProtocolTask', null); // Disables file protocol checking.
+ga('send', 'pageview', '/background'); // Set page, avoiding rejection due to chrome-extension protocol
 
 chrome.runtime.onInstalled.addListener((details) => {
     console.log('Sending ext installed event');
