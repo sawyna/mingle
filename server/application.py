@@ -1,3 +1,4 @@
+import collections
 import logging
 from logging.handlers import RotatingFileHandler
 import platform
@@ -5,10 +6,12 @@ import sys
 
 import flask
 from flask import Flask
-from flask_socketio import SocketIO, send, emit, join_room, leave_room
+from flask_cors import CORS
+from flask_socketio import SocketIO, send, emit, join_room, leave_room, rooms
 
 
 app = Flask(__name__)
+CORS(app, origins=['*'])
 app.config['SECRET_KEY'] = 'secret!'
 file_handler = RotatingFileHandler('logs/app.log', maxBytes=50000000, backupCount=20)
 file_handler.setLevel(logging.INFO)
@@ -20,6 +23,8 @@ logger.setLevel(logging.INFO)
 
 socketio = SocketIO(app, cors_allowed_origins='*', logger=logger)
 
+_ROOMS = collections.defaultdict(list)
+_SID_TO_USERS = collections.defaultdict(dict)
 
 
 @socketio.on('client_send')
@@ -38,11 +43,48 @@ def handle_client_join(message):
     # Handle old message format
     channel_id = message.get('channelId') or message.get('payload', {}).get('channelId')
     join_room(channel_id)
+
+    # In-memory cache
+    _ROOMS[channel_id].append(flask.request.sid)
+    _SID_TO_USERS[flask.request.sid][channel_id] = user_id
     logger.info('User joined room %s %s ', user_id, channel_id)
+
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    sid = flask.request.sid
+    _cleanup_local_cache(sid)
+
+
+def _cleanup_local_cache(sid):
+    # Server restart/some anomaly
+    if sid not in _SID_TO_USERS:
+        return
+        
+    for channel_id, user_id in _SID_TO_USERS[sid].iteritems():
+        if not channel_id:
+            return
+        
+        current_room = _ROOMS[channel_id]
+        if sid in current_room:
+            current_room.remove(sid)
+        
+        if len(current_room) == 0:
+            del _ROOMS[channel_id]
+    
+    del _SID_TO_USERS[sid]
+
+
 
 @app.route('/test')
 def test():
     return 'yash'
+
+@app.route('/channel/<channel_id>/count')
+def get_channel_user_count(channel_id):
+    logger.info('current rooms %s', socketio.server.manager.rooms['/'])
+    logger.info('users in current channel %s', _ROOMS[channel_id])
+    return str(len(_ROOMS[channel_id]))
 
 # run the app.
 if __name__ == "__main__":
