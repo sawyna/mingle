@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import lodash from 'lodash-core';
 
 import WindowHelpers from '../common/WindowHelpers';
+import Util from '../common/Util';
 
 class VideoPlayerProxy {
     constructor() {
@@ -238,9 +239,9 @@ class VideoPlayerProxy {
     }
 }
 
-let init = setInterval(() => {
+let init = Util.customSetInterval(() => {
     let vpp = new VideoPlayerProxy();
     if (!lodash.isNil(vpp.originalp)) {
         clearInterval(init);
     }
-}, 1000);
+}, 1000, true);
