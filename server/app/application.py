@@ -1,3 +1,4 @@
+import os
 import collections
 import logging
 from logging.handlers import RotatingFileHandler
@@ -82,13 +83,13 @@ def test():
 
 @app.route('/channel/<channel_id>/count')
 def get_channel_user_count(channel_id):
-    logger.info('current rooms %s', socketio.server.manager.rooms['/'])
+    # logger.info('current rooms %s', socketio.server.manager.rooms['/'])
     logger.info('users in current channel %s', _ROOMS[channel_id])
     return str(len(_ROOMS[channel_id]))
 
 # run the app.
 if __name__ == "__main__":
-    # Setting debug to True enables debug output. This line should be
-    # removed before deploying a production app.
-    app.debug = False
+    debug = os.getenv('MINGLE_DEBUG', 'True')
+    debug = bool(debug)
+    app.debug = debug
     socketio.run(app, host='0.0.0.0')

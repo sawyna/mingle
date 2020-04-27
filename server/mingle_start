@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [[ -z "$MINGLE_VENV" ]]; then
+    MINGLE_VENV="../mingle_venv"
+fi
+
+deactivate || echo "Not in venv. Skipping deactivate"
+source $MINGLE_VENV/bin/activate
+python app/application.py
