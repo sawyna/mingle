@@ -20,9 +20,8 @@
                 "https://*.netflix.com/*", 
                 "https://*.primevideo.com/*", 
                 "https://*.amazon.com/*", 
-                "https://*.kissanime.ru/*", 
                 "https://*.twitch.tv/*",
-                "https://*.etcrips.com/*"
+                "https://*.disneyplus.com/*"
             ],
             "all_frames": true,
             "js": ["content_scripts.bundle.js"]
