@@ -245,6 +245,11 @@ init = Util.customSetInterval(() => {
         clearInterval(init);
         return;
     }
+
+    if (!Util.isMingleActive()) {
+        clearInterval(init);
+        return;
+    }
     
     vpp = new VideoPlayerProxy();
     
