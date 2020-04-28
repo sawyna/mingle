@@ -1,5 +1,6 @@
 import logging
 from logging.handlers import RotatingFileHandler
+import os
 import platform
 import sys
 
@@ -8,9 +9,16 @@ from flask import Flask
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
 
 
-app = Flask(__name__)
+application = app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-file_handler = RotatingFileHandler('logs/app.log', maxBytes=50000000, backupCount=20)
+log_filename = 'logs/app.log'
+
+try:
+    os.makedirs(os.path.dirname(log_filename), exist_ok=True)
+except:
+    print("Error creating the log file. Please debug further")
+
+file_handler = RotatingFileHandler(log_filename, maxBytes=50000000, backupCount=20)
 file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(logging.Formatter('[%(asctime)s]: %(message)s'))
 
