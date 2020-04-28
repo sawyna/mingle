@@ -27,6 +27,10 @@ const isMingleEnabled = () => {
     return _MINGLE_ENABLED_HOSTS.some((host) => host in hostname);
 }
 
+/**
+ * Common utility functions
+ */
+
 const customSetInterval = (func, timeout, immediate) => {
     if (immediate) {
         func();
@@ -34,6 +38,7 @@ const customSetInterval = (func, timeout, immediate) => {
 
     return setInterval(func, timeout);
 }
+
 
 export default {
     getMingleChannel,

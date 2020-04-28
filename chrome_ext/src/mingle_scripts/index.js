@@ -239,9 +239,13 @@ class VideoPlayerProxy {
     }
 }
 
-let init = Util.customSetInterval(() => {
-    let vpp = new VideoPlayerProxy();
-    if (!lodash.isNil(vpp.originalp)) {
+let init, vpp;
+init = Util.customSetInterval(() => {
+    if (!lodash.isNil(lodash.get(vpp, 'originalp'))) {
         clearInterval(init);
+        return;
     }
+    
+    vpp = new VideoPlayerProxy();
+    
 }, 1000, true);

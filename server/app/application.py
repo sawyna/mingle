@@ -54,6 +54,7 @@ def handle_client_join(message):
 @socketio.on('disconnect')
 def handle_disconnect():
     sid = flask.request.sid
+    logger.info('Received disconnect for sid %s and users %s', sid, _SID_TO_USERS.get(sid))
     _cleanup_local_cache(sid)
 
 
@@ -83,7 +84,6 @@ def test():
 
 @app.route('/channel/<channel_id>/count')
 def get_channel_user_count(channel_id):
-    # logger.info('current rooms %s', socketio.server.manager.rooms['/'])
     logger.info('users in current channel %s', _ROOMS[channel_id])
     return str(len(_ROOMS[channel_id]))
 
