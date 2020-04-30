@@ -12,6 +12,7 @@
     "license": "ISC",
     "devDependencies": {
         "@babel/core": "^7.9.0",
+        "@babel/preset-react": "^7.9.4",
         "babel-loader": "^8.1.0",
         "copy-webpack-plugin": "^5.1.1",
         "file-loader": "^6.0.0",
@@ -22,6 +23,8 @@
     },
     "dependencies": {
         "lodash-core": "^4.17.15",
+        "react": "^16.13.1",
+        "react-dom": "^16.13.1",
         "socket.io-client": "^2.3.0",
         "uuid": "^7.0.2"
     }

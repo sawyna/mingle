@@ -1,6 +1,15 @@
 import { v4 as uuidv4 } from 'uuid';
 import WindowHelpers from '../common/WindowHelpers';
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App.jsx';
+
+ReactDOM.render(
+    <App />,
+    document.getElementById('app'),
+);
+
 let createChannel = () => {
     let button = document.getElementById('start_channel');
     button.onclick = handleStartChannel;
