@@ -3,47 +3,12 @@ import WindowHelpers from '../common/WindowHelpers';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App.jsx';
+import App from './App';
 
 ReactDOM.render(
     <App />,
     document.getElementById('app'),
 );
-
-let createChannel = () => {
-    let button = document.getElementById('start_channel');
-    button.onclick = handleStartChannel;
-}
-
-let handleStartChannel = (e) => {
-    let channelId = uuidv4();
-    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-        console.log(tabs[0]);
-        let currentURL = new URL(tabs[0].url);
-        currentURL.searchParams.set('mingleChannelId', channelId);
-        let mingleUrl = currentURL.toString();
-
-        ga('send', 'event', 'CREATE_CHANNEL', currentURL.hostname);
-        copyToClipboard(mingleUrl);
-        chrome.tabs.sendMessage(tabs[0].id, {
-            action: 'MINGLE_RELOAD',
-            payload: {
-                url: mingleUrl,
-            },
-        });
-    });
-}
-
-function copyToClipboard(text) {
-    var dummy = document.createElement("textarea");
-    document.body.appendChild(dummy);
-    dummy.value = text;
-    dummy.select();
-    document.execCommand("copy");
-    document.body.removeChild(dummy);
-}
-
-createChannel();
 
 /**
  * Google Analytics

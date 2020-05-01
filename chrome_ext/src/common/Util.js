@@ -16,8 +16,13 @@ const getMingleChannel = (url) => {
     return urlInstance.searchParams.get('mingleChannelId');
 };
 
-const isMingleActive = () => {
-    return lodash.isNil(getMingleChannel());
+const isMingleActive = (url) => {
+    return !lodash.isNil(getMingleChannel(url));
+}
+
+const isMingleActiveExternal = () => {
+    return getCurrentTab()
+        .then(tab => isMingleActive(tab.url));
 }
 
 const isMingleEnabled = () => {
@@ -39,10 +44,42 @@ const customSetInterval = (func, timeout, immediate) => {
     return setInterval(func, timeout);
 }
 
+const copyToClipboard = (text) => {
+    var dummy = document.createElement("textarea");
+    document.body.appendChild(dummy);
+    dummy.value = text;
+    dummy.select();
+    document.execCommand("copy");
+    document.body.removeChild(dummy);
+}
+
+/**
+ * Chrome utility functions
+ */
+
+const getCurrentTab = () => {
+    return new Promise((resolve, reject) => {
+        try {
+            chrome.tabs.query({
+                active: true,
+                currentWindow: true,
+            }, (tabs) => {
+                resolve(tabs[0]);
+            });
+        }
+        catch (err) {
+            reject(err);
+        }
+    });
+}
+
 
 export default {
     getMingleChannel,
     isMingleActive,
+    isMingleActiveExternal,
     isMingleEnabled,
     customSetInterval,
+    copyToClipboard,
+    getCurrentTab,
 }

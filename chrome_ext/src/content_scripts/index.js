@@ -45,7 +45,7 @@ chrome.runtime.onMessage.addListener((msg) => {
          * Msg from popup
          */
         const url = msg.payload.url;
-        alert("URL copied to clipboard :). Share this with your loved ones and enjoy!");
+        // alert("URL copied to clipboard :). Share this with your loved ones and enjoy!");
         window.location.href = url;
     }
 });
@@ -57,6 +57,8 @@ chrome.runtime.onMessage.addListener((msg) => {
 chrome.runtime.sendMessage({
     action: 'MINGLE_FETCH_TAB_ID'
 }, (response) => {
+    console.log(`receive tabId`);
+    console.log(response);
     tabId = response.tabId;
 });
 
