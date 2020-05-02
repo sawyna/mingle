@@ -1,15 +1,20 @@
 import React from 'react';
+import Button from 'react-bootstrap/Button';
+import Alert from 'react-bootstrap/Alert';
 import lodash from 'lodash-core';
 
 import Util from '../common/Util';
 
-export default class MingleActive extends React.Component {
+export default class MingleContent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             activeUserCount: '1',
             tab: null,
+            alertContent: 'Copy URL',
         }
+
+        this.handleShareClick = this.handleShareClick.bind(this);
     }
 
     get tabId() {
@@ -36,6 +41,16 @@ export default class MingleActive extends React.Component {
         });
     }
 
+    handleShareClick() {
+        Util.getCurrentTab()
+        .then(tab => {
+            Util.copyToClipboard(tab.url);
+            this.setState({
+                alertContent: 'Copied!',
+            });
+        });
+    }
+
     componentDidMount() {
         Util.getCurrentTab().then(tab => {
             console.log(tab);
@@ -46,20 +61,13 @@ export default class MingleActive extends React.Component {
     }
 
     _renderActive() {
-        const { activeUserCount } = this.state;
+        const { activeUserCount, alertContent } = this.state;
         return (
             <div className='d-flex flex-column align-items-center'>
                 <div class='small'>Active users</div>
                 <div>{activeUserCount}</div>
-                <button
-                    class='btn btn-sm btn-primary'
-                    data-container='body'
-                    data-toggle='popover'
-                    data-placement='bottom'
-                    data-content='Copy to clipboard'
-                >
-                    Share and enjoy!
-                </button>
+                <Button variant='primary' size='sm' onClick={this.handleShareClick}>Share and enjoy!</Button>
+                <Alert variant='light' className='small'>{alertContent}</Alert>
             </div>
         );
     }
