@@ -1,5 +1,7 @@
 import lodash from 'lodash-core';
 
+import Constants from './Constants';
+
 const _MINGLE_ENABLED_HOSTS = [
     'youtube',
     'netflix',
@@ -30,6 +32,22 @@ const isMingleEnabled = () => {
     const hostname = url.hostname;
 
     return _MINGLE_ENABLED_HOSTS.some((host) => host in hostname);
+}
+
+const isDevelopment = () => {
+    if (process.env.NODE_ENV === Constants.APP_MODES.DEV) {
+        return true;
+    }
+
+    return false;
+}
+
+const isProduction = () => {
+    if (process.env.NODE_ENV === Constants.APP_MODES.PROD) {
+        return true;
+    }
+
+    return false;
 }
 
 /**
@@ -73,13 +91,27 @@ const getCurrentTab = () => {
     });
 }
 
+/**
+ * GA utilities
+ */
+const customGA = (func, ...args) => {
+    if (process.env.NODE_ENV === Constants.APP_MODES.DEV) {
+        console.log(`Ignoring ga on dev mode`);
+        return;
+    }
+
+    func(...args);
+}
 
 export default {
     getMingleChannel,
     isMingleActive,
     isMingleActiveExternal,
     isMingleEnabled,
+    isDevelopment,
+    isProduction,
     customSetInterval,
     copyToClipboard,
     getCurrentTab,
+    customGA,
 }

@@ -239,18 +239,28 @@ class VideoPlayerProxy {
     }
 }
 
-let init, vpp;
-init = Util.customSetInterval(() => {
-    if (!lodash.isNil(lodash.get(vpp, 'originalp'))) {
-        clearInterval(init);
+let init = () => {
+    if (!Util.isMingleEnabled()) {
+        console.log('Skipping mingle script init');
         return;
     }
 
-    if (!Util.isMingleActive()) {
-        clearInterval(init);
-        return;
-    }
-    
-    vpp = new VideoPlayerProxy();
-    
-}, 1000, true);
+    let intervalId, vpp;
+    intervalId = Util.customSetInterval(() => {
+        if (!lodash.isNil(lodash.get(vpp, 'originalp'))) {
+            clearInterval(intervalId);
+            return;
+        }
+
+        if (!Util.isMingleActive()) {
+            clearInterval(intervalId);
+            return;
+        }
+        
+        vpp = new VideoPlayerProxy();
+        
+    }, 1000, true);
+}
+
+init();
+

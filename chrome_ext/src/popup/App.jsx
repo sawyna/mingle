@@ -22,7 +22,7 @@ export default class App extends React.Component {
     render() {
         const { isMingleActive } = this.state;
         return (
-            <div className="container">
+            <div className="container m-10">
                 <div
                     className="row justify-content-center"
                     style={{

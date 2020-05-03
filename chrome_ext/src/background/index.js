@@ -4,6 +4,7 @@ import MingleChannelNode from "../common/MingleChannelNode";
 import MingleClient from "../common/MingleClient";
 import Util from '../common/Util';
 import Constants from '../common/Constants';
+import GA from '../common/GA';
 
 const _CACHE = {};
 
@@ -94,18 +95,10 @@ let setBadgeText = (channelId, tabId) => {
 /**
  * Google Analytics
  */
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-    
-ga('create', 'UA-163387829-1', 'auto');
-// Modifications: 
-ga('set', 'checkProtocolTask', null); // Disables file protocol checking.
-ga('send', 'pageview', '/background'); // Set page, avoiding rejection due to chrome-extension protocol
+GA.invoke('send', 'pageview', '/background'); // Set page, avoiding rejection due to chrome-extension protocol
 
 chrome.runtime.onInstalled.addListener((details) => {
     console.log('Sending ext installed event');
     console.log(details);
-    ga('send', 'event', 'INSTALL', details.reason, details.previousVersion);
+    GA.invoke('send', 'event', 'INSTALL', details.reason, details.previousVersion);
 });
