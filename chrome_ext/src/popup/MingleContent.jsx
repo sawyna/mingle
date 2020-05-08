@@ -34,7 +34,7 @@ export default class MingleContent extends React.Component {
         chrome.browserAction.getBadgeText({
             tabId: this.tabId,
         }, (result) => {
-            if (lodash.empty(result)) {
+            if (lodash.isEmpty(result)) {
                 return;
             }
             
@@ -95,6 +95,11 @@ export default class MingleContent extends React.Component {
             <div className='justify-content-center'>
                 <div>
                     <small className='font-italic'>
+                        - Open a video
+                    </small>
+                </div>
+                <div>
+                    <small className='font-italic'>
                         - Click the above button to create a channel
                     </small>
                 </div>
@@ -122,7 +127,7 @@ export default class MingleContent extends React.Component {
                 }}>
                     Content
                 </div>
-                <div class='pt-2'>
+                <div className='pt-2'>
                     {
                         active ? this._renderActive() : this._renderNormal()
                     }

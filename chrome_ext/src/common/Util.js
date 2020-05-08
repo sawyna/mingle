@@ -2,12 +2,6 @@ import lodash from 'lodash-core';
 
 import Constants from './Constants';
 
-const _MINGLE_ENABLED_HOSTS = [
-    'youtube',
-    'netflix',
-    'amazon',
-    'primevideo',
-];
 
 const getMingleChannel = (url) => {
     if (lodash.isUndefined(url)) {
@@ -27,11 +21,19 @@ const isMingleActiveExternal = () => {
         .then(tab => isMingleActive(tab.url));
 }
 
-const isMingleEnabled = () => {
-    const url = new URL(document.URL);
+const isMingleEnabledExternal = () => {
+    return getCurrentTab()
+    .then(tab => isMingleEnabled(tab.url));
+}
+
+const isMingleEnabled = (url) => {
+    if (lodash.isUndefined(url)) {
+        url = document.URL;
+    }
+    url = new URL(url);
     const hostname = url.hostname;
 
-    return _MINGLE_ENABLED_HOSTS.some((host) => host in hostname);
+    return Constants.MINGLE_ENABLED_HOSTS.some((host) => hostname.includes(host));
 }
 
 const isDevelopment = () => {
@@ -107,6 +109,7 @@ export default {
     getMingleChannel,
     isMingleActive,
     isMingleActiveExternal,
+    isMingleEnabledExternal,
     isMingleEnabled,
     isDevelopment,
     isProduction,
