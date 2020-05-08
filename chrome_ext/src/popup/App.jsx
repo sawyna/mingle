@@ -56,6 +56,9 @@ export default class App extends React.Component {
         return (
             <div className='row small'>
                 <Card>
+                    <Card.Header className='alert-danger'>
+                        This platform is currently not supported
+                    </Card.Header>
                     <Card.Body>
                         <Card.Title>Supported platforms</Card.Title>
                     </Card.Body>
@@ -68,9 +71,6 @@ export default class App extends React.Component {
                             })
                         }
                     </ListGroup>
-                    <Card.Footer className='alert-danger'>
-                        This platform is currently not supported
-                    </Card.Footer>
                 </Card>
             </div>
         );

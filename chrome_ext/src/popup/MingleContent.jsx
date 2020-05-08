@@ -94,7 +94,7 @@ export default class MingleContent extends React.Component {
         return (
             <div className='justify-content-center'>
                 <div>
-                    <small className='font-italic'>
+                    <small className='font-weight-bold font-italic'>
                         - Open a video
                     </small>
                 </div>
