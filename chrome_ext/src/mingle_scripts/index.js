@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import lodash from 'lodash-core';
 
 import WindowHelpers from '../common/WindowHelpers';
+import Util from '../common/Util';
 
 class VideoPlayerProxy {
     constructor() {
@@ -238,9 +239,28 @@ class VideoPlayerProxy {
     }
 }
 
-let init = setInterval(() => {
-    let vpp = new VideoPlayerProxy();
-    if (!lodash.isNil(vpp.originalp)) {
-        clearInterval(init);
+let init = () => {
+    if (!Util.isMingleEnabled()) {
+        console.log('Skipping mingle script init');
+        return;
     }
-}, 1000);
+
+    let intervalId, vpp;
+    intervalId = Util.customSetInterval(() => {
+        if (!lodash.isNil(lodash.get(vpp, 'originalp'))) {
+            clearInterval(intervalId);
+            return;
+        }
+
+        if (!Util.isMingleActive()) {
+            clearInterval(intervalId);
+            return;
+        }
+        
+        vpp = new VideoPlayerProxy();
+        
+    }, 1000, true);
+}
+
+init();
+

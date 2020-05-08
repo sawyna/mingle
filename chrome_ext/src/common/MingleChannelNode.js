@@ -1,3 +1,6 @@
+import lodash from 'lodash-core';
+
+
 export default class MingleChannelNode {
     constructor(type, channel_name, handleReceive) {
         this.type = type;

@@ -1,2 +1,0 @@
-runtime: python37
-entrypoint: gunicorn -k gevent -w 1 -b :$PORT application:app
