@@ -7,7 +7,7 @@ import platform
 import sys
 
 import flask
-from flask import Flask
+from flask import Flask, redirect
 from flask_cors import CORS
 from flask_socketio import SocketIO, send, emit, join_room, leave_room, rooms
 
@@ -16,6 +16,7 @@ app = Flask(__name__)
 CORS(app, origins=['*'])
 app.config['SECRET_KEY'] = 'secret!'
 log_filename = 'logs/app.log'
+_SURVERY_URL = 'https://www.surveymonkey.com/r/732V586'
 
 try:
     os.makedirs(os.path.dirname(log_filename), exist_ok=True)
@@ -90,10 +91,18 @@ def _cleanup_local_cache(sid):
 def test():
     return 'yash'
 
+
 @app.route('/channel/<channel_id>/count')
 def get_channel_user_count(channel_id):
     logger.info('users in current channel %s', _ROOMS[channel_id])
     return str(len(_ROOMS[channel_id]))
+
+
+@app.route('/uninstall')
+def uninstall_app():
+    logger.info('Received uninstall request. Redirecting to survey monkey')
+    return redirect(_SURVERY_URL)
+
 
 # run the app.
 if __name__ == "__main__":
