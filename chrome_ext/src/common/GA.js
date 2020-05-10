@@ -1,4 +1,6 @@
-import Util from "./Util";
+import lodash from 'lodash-core';
+
+import Util from './Util';
 
 class GA {
     constructor(id) {
@@ -33,6 +35,17 @@ class GA {
             return;
         }
         window.ga(...args);
+    }
+
+    get clientId() {
+        if (Util.isDevelopment()) {
+            return 'ga-dev';
+        }
+
+        let tracker = window.ga.getAll();
+        if (!lodash.isNil(tracker) && tracker.length > 0) {
+            return tracker[0].get('clientId');
+        }
     }
 }
 

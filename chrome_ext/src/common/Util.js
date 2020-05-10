@@ -52,6 +52,14 @@ const isProduction = () => {
     return false;
 }
 
+const getServerURL = () => {
+    if (isDevelopment()) {
+        return Constants.DEV_SERVER_URL;
+    }
+
+    return Constants.PROD_SERVER_URL;
+}
+
 /**
  * Common utility functions
  */
@@ -113,6 +121,7 @@ export default {
     isMingleEnabled,
     isDevelopment,
     isProduction,
+    getServerURL,
     customSetInterval,
     copyToClipboard,
     getCurrentTab,

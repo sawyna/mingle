@@ -1,5 +1,5 @@
-const SERVER_URL = 'http://34.210.140.190:5000';
-// const SERVER_URL = 'http://localhost:5000';
+const PROD_SERVER_URL = 'http://34.210.140.190:5000';
+const DEV_SERVER_URL = 'http://localhost:5000';
 
 const APP_MODES = {
     DEV: 'development',
@@ -20,7 +20,8 @@ const MINGLE_ENABLED_SITES = {
 };
 
 export default {
-    SERVER_URL,
+    PROD_SERVER_URL,
+    DEV_SERVER_URL,
     APP_MODES,
     MINGLE_ENABLED_HOSTS,
     MINGLE_ENABLED_SITES,

@@ -1,9 +1,9 @@
 import io from 'socket.io-client';
-import Constants from './Constants';
+import Util from './Util';
 
 export default class MingleClient {
     constructor() {
-        this.socket = io(Constants.SERVER_URL);
+        this.socket = io(Util.getServerURL());
         this.setup();
     }
 

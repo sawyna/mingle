@@ -3,7 +3,6 @@ import lodash from 'lodash-core';
 import MingleChannelNode from "../common/MingleChannelNode";
 import MingleClient from "../common/MingleClient";
 import Util from '../common/Util';
-import Constants from '../common/Constants';
 import GA from '../common/GA';
 
 const _CACHE = {};
@@ -73,7 +72,7 @@ let initBadge = (msg) => {
 }
 
 let setBadgeText = (channelId, tabId) => {
-    fetch(`${Constants.SERVER_URL}/channel/${channelId}/count`)
+    fetch(`${Util.getServerURL()}/channel/${channelId}/count`)
     .then(response => response.text())
     .then((userCount) => {
         console.log(userCount);
@@ -91,6 +90,12 @@ let setBadgeText = (channelId, tabId) => {
     });
 }
 
+let getUninstallURL = () => {
+    let dev = Util.isDevelopment() ? '1' : '0';
+
+    return `${Util.getServerURL()}/uninstall?dev=${dev}&cid=${GA.clientId}`;
+}
+
 
 /**
  * Google Analytics
@@ -102,3 +107,5 @@ chrome.runtime.onInstalled.addListener((details) => {
     console.log(details);
     GA.invoke('send', 'event', 'INSTALL', details.reason, details.previousVersion);
 });
+
+chrome.runtime.setUninstallURL(getUninstallURL());
