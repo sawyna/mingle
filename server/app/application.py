@@ -123,7 +123,7 @@ def uninstall_app():
 
 # run the app.
 if __name__ == "__main__":
-    debug = os.getenv('MINGLE_DEBUG', 'True')
-    debug = bool(debug)
+    debug = os.getenv('MINGLE_DEBUG')
+    debug = True if debug == 'True' else False
     app.debug = debug
     socketio.run(app, host='0.0.0.0')
