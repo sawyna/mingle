@@ -6,4 +6,4 @@ fi
 
 deactivate || echo "Not in venv. Skipping deactivate"
 source $MINGLE_VENV/bin/activate
-python app/application.py
+PYTHONPATH=$PYTHONPATH:./ python app/application.py
