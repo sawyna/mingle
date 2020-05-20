@@ -6,16 +6,21 @@ import os
 import platform
 import sys
 
+from app.analytics import GA
 import flask
-from flask import Flask
+from flask import Flask, redirect, request
 from flask_cors import CORS
 from flask_socketio import SocketIO, send, emit, join_room, leave_room, rooms
 
+_SURVERY_URL = 'https://www.surveymonkey.com/r/732V586'
+
+_GA_TRACKER = GA('UA-163387829-1')
 
 app = Flask(__name__)
 CORS(app, origins=['*'])
 app.config['SECRET_KEY'] = 'secret!'
 log_filename = 'logs/app.log'
+
 
 try:
     os.makedirs(os.path.dirname(log_filename), exist_ok=True)
@@ -88,16 +93,37 @@ def _cleanup_local_cache(sid):
 
 @app.route('/test')
 def test():
+    logger.info('request params %s', request.args)
+    cid = request.args.get('cid')
+    _GA_TRACKER.event('test', 'test_action', headers={
+        'User-Agent': request.headers.get('User-Agent'),
+    }, cid=cid, ip_address=request.remote_addr)
     return 'yash'
+
 
 @app.route('/channel/<channel_id>/count')
 def get_channel_user_count(channel_id):
     logger.info('users in current channel %s', _ROOMS[channel_id])
     return str(len(_ROOMS[channel_id]))
 
+
+@app.route('/uninstall')
+def uninstall_app():
+    logger.info('Received uninstall request. Redirecting to survey monkey')
+    cid = request.args.get('cid')
+    is_dev = request.args.get('dev')
+    is_dev = True if is_dev == '1' else False
+
+    if not is_dev:
+        _GA_TRACKER.event('INSTALL', event_action='uninstall', headers={
+            'User-Agent': request.headers.get('User-Agent'),
+        }, cid=cid, ip_address=request.remote_addr)
+    return redirect(_SURVERY_URL)
+
+
 # run the app.
 if __name__ == "__main__":
-    debug = os.getenv('MINGLE_DEBUG', 'True')
-    debug = bool(debug)
+    debug = os.getenv('MINGLE_DEBUG')
+    debug = True if debug == 'True' else False
     app.debug = debug
     socketio.run(app, host='0.0.0.0')
