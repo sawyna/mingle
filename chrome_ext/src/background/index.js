@@ -90,13 +90,6 @@ let setBadgeText = (channelId, tabId) => {
     });
 }
 
-let getUninstallURL = () => {
-    let dev = Util.isDevelopment() ? '1' : '0';
-
-    return `${Util.getServerURL()}/uninstall?dev=${dev}&cid=${GA.clientId}`;
-}
-
-
 /**
  * Google Analytics
  */
@@ -108,4 +101,10 @@ chrome.runtime.onInstalled.addListener((details) => {
     GA.invoke('send', 'event', 'INSTALL', details.reason, details.previousVersion);
 });
 
-chrome.runtime.setUninstallURL(getUninstallURL());
+// callback to GA because ga may not be initialised at that point.
+GA.invoke(() => {
+    let dev = Util.isDevelopment() ? '1' : '0';
+    const uninstallURL = `${Util.getServerURL()}/uninstall?dev=${dev}&cid=${GA.clientId}`;
+    chrome.runtime.setUninstallURL(uninstallURL);
+});
+
