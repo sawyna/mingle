@@ -72,6 +72,10 @@ let initBadge = (msg) => {
 }
 
 let setBadgeText = (channelId, tabId) => {
+    if (lodash.isNil(tabId)) {
+        console.log('Do not set badge text will null tabId');
+        return;
+    }
     fetch(`${Util.getServerURL()}/channel/${channelId}/count`)
     .then(response => response.text())
     .then((userCount) => {
