@@ -10,6 +10,7 @@ import Turnon from '../../images/turnon_128.png';
 import Util from '../common/Util';
 import GA from '../common/GA';
 
+// https://www.flaticon.com/free-icon/stand-by_485963?term=turn%20off&page=1&position=2
 export default class MingleButton extends React.Component {
     constructor(props) {
         super(props);
@@ -53,11 +54,14 @@ export default class MingleButton extends React.Component {
     render() {
         const { active } = this.props;
         const btnImage = active ? Turnon : Turnoff;
+        const style = !active ? {
+            opacity: 0.5,
+        } : {};
         return (
             <div className='d-flex flex-column align-items-center'>
                 <div>
                     <button className='btn' onClick={this.handleClick}>
-                        <img src={btnImage} />
+                        <img src={btnImage} style={style}/>
                     </button>
                 </div>
                 {
