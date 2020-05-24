@@ -100,7 +100,7 @@ export default class MingleContent extends React.Component {
                 </div>
                 <div>
                     <small className='font-italic'>
-                        - Click the above button to create a channel
+                        - Click the above power button to create a room
                     </small>
                 </div>
                 <div>
