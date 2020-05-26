@@ -16,7 +16,7 @@ class GA(object):
         return requests.post(_GA_TRACKING_URL, data=params, headers=headers)
 
     def _sanitize(self, params):
-        return {k: v for k, v in params.iteritems() if v}
+        return {k: v for k, v in params.items() if v}
     
     def _add_default(self, params):
         params.update({

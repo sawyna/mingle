@@ -16,7 +16,7 @@ _SURVERY_URL = 'https://www.surveymonkey.com/r/732V586'
 
 _GA_TRACKER = GA('UA-163387829-1')
 
-app = Flask(__name__)
+application = app = Flask(__name__)
 CORS(app, origins=['*'])
 app.config['SECRET_KEY'] = 'secret!'
 log_filename = 'logs/app.log'
@@ -76,7 +76,7 @@ def _cleanup_local_cache(sid):
     if sid not in _SID_TO_USERS:
         return
         
-    for channel_id, user_id in _SID_TO_USERS[sid].iteritems():
+    for channel_id, user_id in _SID_TO_USERS[sid].items():
         if not channel_id:
             return
         
