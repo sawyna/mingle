@@ -64,10 +64,9 @@ let init = () => {
         console.log(`receive tabId`);
         console.log(response);
         tabId = response.tabId;
+        ScriptInjector.inject();
+        scriptEvents();
     });
-
-    ScriptInjector.inject();
-    scriptEvents();
 }
 
 init();
