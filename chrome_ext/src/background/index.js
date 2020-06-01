@@ -46,6 +46,14 @@ const initMCSink = function (channelName) {
             _CACHE[channelName].badgeHandler = initBadge(msg);
         }
         else if (msg.action === 'MINGLE_DISCONNECT') {
+
+            // unset badge text as part of teardown
+            if (!lodash.isNil(msg.tabId)) {
+                chrome.browserAction.setBadgeText({
+                    text: '',
+                    tabId: msg.tabId,
+                });
+            }
             clearInterval(_CACHE[channelName].badgeHandler);
         }
         mingleClient.send(msg);
