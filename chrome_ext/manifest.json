@@ -38,6 +38,6 @@
     },
     "icons": {
         "16": "images/sync.png",
-        "128": "images/sync128.png"
+        "128": "images/sync512.png"
     }
 }

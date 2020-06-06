@@ -11,6 +11,7 @@ import Util from '../common/Util';
 import GA from '../common/GA';
 
 // https://www.flaticon.com/free-icon/stand-by_485963?term=turn%20off&page=1&position=2
+// https://www.flaticon.com/free-icon/sync_2001922?term=sync&page=1&position=60
 export default class MingleButton extends React.Component {
     constructor(props) {
         super(props);
